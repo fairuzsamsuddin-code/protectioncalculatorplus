@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="ms" id="htmlTag">
+<head>
+    <meta charset="UTF-8">
+    <!-- Diperbaiki: user-scalable=no dan maximum-scale=1.0 dibuang untuk membenarkan pinch-zoom -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">Kalkulator Keperluan Perlindungan</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #D9000D;
+            --primary-hover: #ff1e2d;
+            --teal: #008183;
+            --teal-hover: #00b5b8;
+            --bg-body: #09090b;
+            --text-main: #f4f4f5;
+            --text-muted: #a1a1aa;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --nav-bg: rgba(9, 9, 11, 0.75);
+            --card-bg: rgba(24, 24, 27, 0.6);
+            --input-bg: #09090b;
+            --input-container-bg: rgba(0, 0, 0, 0.4);
+            --ambient-gradient: radial-gradient(circle at 50% 0%, rgba(217,0,13,0.15) 0%, transparent 60%), radial-gradient(circle at 80% 80%, rgba(0,129,131,0.1) 0%, transparent 50%);
+        }
+
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg-body: #f8fafc;
+                --text-main: #1e293b;
+                --text-muted: #64748b;
+                --border-color: rgba(0, 0, 0, 0.1);
+                --nav-bg: rgba(255, 255, 255, 0.75);
+                --card-bg: rgba(255, 255, 255, 0.8);
+                --input-bg: #ffffff;
+                --input-container-bg: rgba(241, 245, 249, 0.6);
+                --ambient-gradient: radial-gradient(circle at 50% 0%, rgba(217,0,13,0.05) 0%, transparent 60%), radial-gradient(circle at 80% 80%, rgba(0,129,131,0.05) 0%, transparent 50%);
+            }
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+        html { scroll-behavior: smooth; }
+        body { 
+            overflow-x: hidden; width: 100%; background-color: var(--bg-body); 
+            color: var(--text-main); min-height: 100vh; display: flex; 
+            flex-direction: column; background-image: var(--ambient-gradient);
+            background-attachment: fixed; transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        .grid-row { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+        @media (min-width: 768px) {
+            .grid-row-2 { grid-template-columns: repeat(2, 1fr); }
+            .grid-row-3 { grid-template-columns: repeat(3, 1fr); }
+            #resultsGrid { grid-template-columns: repeat(3, 1fr); }
+        }
+        
+        .glass-nav { background: var(--nav-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--border-color); box-shadow: 0 4px 30px rgba(0,0,0,0.1); }
+        .glass-card { background: var(--card-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--border-color); box-shadow: 0 8px 32px rgba(0,0,0,0.15); transition: all 0.3s ease; }
+        .glass-input-container { background: var(--input-container-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-color); border-radius: 1rem; padding: 1.5rem; }
+        @media(min-width: 768px) { .glass-input-container { padding: 2.5rem; } }
+        
+        .form-input { display: block; width: 100%; padding: 0.75rem 1rem; height: 3rem; border-radius: 0.75rem; background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-main); outline: none; transition: all 0.3s; font-size: 0.95rem; }
+        .form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(217,0,13,0.3); }
+        .form-label { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem; display: flex; align-items: center; letter-spacing: 0.05em; text-transform: uppercase; }
+        
+        .btn-primary { position: relative; overflow: hidden; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; transition: all 0.3s ease; background: var(--primary); color: white; min-height: 3.5rem; border-radius: 9999px; padding: 0 2rem; font-size: 1rem; font-weight: 600; box-shadow: 0 4px 15px rgba(217,0,13,0.3); border: none; width: 100%; }
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 6px 25px rgba(217,0,13,0.5); }
+        .btn-teal { background: var(--teal); box-shadow: 0 4px 15px rgba(0,129,131,0.3); }
+        .btn-teal:hover { background: var(--teal-hover); box-shadow: 0 6px 25px rgba(0,129,131,0.5); }
+        .btn-outline { background: transparent; border: 2px solid var(--border-color); color: var(--text-main); box-shadow: none; }
+        .btn-outline:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); border-color: var(--text-muted); }
+        
+        .btn-whatsapp { background: #25D366; box-shadow: 0 4px 15px rgba(37,211,102,0.3); }
+        .btn-whatsapp:hover { background: #128C7E; box-shadow: 0 6px 25px rgba(37,211,102,0.5); }
+        
+        @keyframes fadeOutLoader { 0% { opacity: 1; visibility: visible; } 99% { opacity: 0; visibility: visible; } 100% { opacity: 0; visibility: hidden; z-index: -1; } }
+        #opening-sequence { transition: opacity 0.5s ease; }
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 1s cubic-bezier(0.25, 0.1, 0.25, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        
+        .result-card { background: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid var(--border-color); border-radius: 1rem; padding: 2rem; text-align: center; transition: all 0.5s; display: flex; flex-direction: column; }
+        .result-card:hover { border-color: var(--primary); transform: translateY(-5px); box-shadow: 0 15px 35px rgba(217,0,13,0.2); }
+        .result-icon { width: 3.5rem; height: 3.5rem; margin: 0 auto 1rem auto; border-radius: 50%; background: rgba(217,0,13,0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
+        .result-icon-teal { background: rgba(0,129,131,0.1); color: var(--teal); }
+        .result-title { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+        .result-amount { font-size: 1.8rem; font-weight: 800; color: var(--text-main); transition: color 0.4s ease; }
+        
+        /* Infotip Container */
+        .infotip-box { 
+            display: none; position: absolute; bottom: 100%; left: 50%; z-index: 100; margin-bottom: 0.75rem; 
+            width: 320px; transform: translateX(-50%); border-radius: 0.75rem; background: #18181b; 
+            border: 1px solid rgba(255, 255, 255, 0.15); padding: 1rem; text-align: left; font-size: 0.75rem; 
+            line-height: 1.5; color: #f4f4f5; box-shadow: 0 10px 25px rgba(0,0,0,0.8); text-transform: none; font-weight: normal; 
+        }
+        @media (prefers-color-scheme: light) {
+            .infotip-box { background: #1e293b; color: #f8fafc; border-color: rgba(255,255,255,0.2); }
+        }
+        .infotip-box::after {
+            content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px;
+            border-width: 5px; border-style: solid; border-color: #18181b transparent transparent transparent;
+        }
+        @media (prefers-color-scheme: light) { .infotip-box::after { border-color: #1e293b transparent transparent transparent; } }
+        .infotip-box.show { display: block; }
+        /* Fix Infotip bleeding on mobile edges */
+        @media(max-width: 400px) { .infotip-box { width: 280px; left: 10%; transform: translateX(-10%); } .infotip-box::after { left: 15%; } }
+
+        /* Report Modal Styling */
+        #reportModal { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px); align-items: center; justify-content: center; padding: 1rem; overflow-y: auto; }
+        .modal-content { background: #ffffff; color: #1e293b; width: 100%; max-width: 680px; border-radius: 1rem; padding: 1.25rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); position: relative; max-height: 95vh; overflow-y: auto; }
+
+        /* Print Enforcements (Refined for legibility) */
+        @media print {
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box !important; }
+            html, body { width: 210mm; height: 297mm; background: white !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important; }
+            body * { visibility: hidden !important; }
+            #reportModal, #reportModal * { visibility: visible !important; }
+            #reportModal { position: absolute !important; left: 0 !important; top: 0 !important; width: 210mm !important; height: 297mm !important; background: white !important; padding: 0 !important; margin: 0 !important; display: block !important; overflow: hidden !important; z-index: 99999 !important; }
+            .modal-content { box-shadow: none !important; width: 210mm !important; height: 285mm !important; max-height: 285mm !important; padding: 10mm 15mm !important; margin: 0 !important; border: none !important; overflow: hidden !important; background: white !important; }
+            .no-print { display: none !important; }
+            @page { size: A4 portrait; margin: 0mm; } 
+            
+            /* Increased font sizes for print legibility */
+            .print-text { font-size: 10px !important; }
+            .print-title { font-size: 16px !important; }
+            .print-sub { font-size: 11px !important; }
+            .print-th, .print-td { font-size: 10px !important; padding: 4px 6px !important; }
+            .print-footer-text { font-size: 8.5px !important; line-height: 1.3 !important;}
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Splash Screen (Now controlled by sessionStorage) -->
+    <div id="opening-sequence" style="position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; background: #09090b; cursor: pointer;">
+        <div style="position: relative; display: flex; flex-direction: column; align-items: center;">
+            <div style="position: absolute; width: 10rem; height: 10rem; background: rgba(217,0,13,0.2); border-radius: 50%; filter: blur(40px);"></div>
+            <i class="fas fa-shield-halved" style="font-size: 3rem; color: white; z-index: 10; margin-bottom: 1.5rem; text-shadow: 0 0 15px rgba(255,255,255,0.3);"></i>
+            <h1 style="font-size: 1.25rem; font-weight: 800; color: white; letter-spacing: 0.2em; text-transform: uppercase; z-index: 10;" data-translate="anim_title">Kalkulator Perlindungan</h1>
+            <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 1rem;">Tap to skip</p>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="glass-nav" style="position: sticky; top: 0; z-index: 50; width: 100%;">
+        <div style="max-width: 64rem; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 1rem; width: 100%;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div style="display: flex; flex-direction: column;">
+                    <span style="font-size: 0.95rem; font-weight: 900; text-transform: uppercase; letter-spacing: -0.025em; color: var(--primary);" data-translate="brand_title">TAKAFUL SERVICES</span>
+                    <span style="margin-top: 0.25rem; font-size: 0.7rem; font-weight: 500; color: var(--text-muted);" data-translate="brand_sub">by Fairuz Samsuddin</span>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <button type="button" onclick="toggleLanguage()" id="langBtn" style="display: flex; align-items: center; gap: 0.5rem; border-radius: 9999px; border: 1px solid var(--border-color); background: var(--card-bg); padding: 0.5rem 1rem; font-size: 0.75rem; font-weight: 700; color: var(--text-main); cursor: pointer; transition: background 0.2s;">
+                    <i class="fas fa-globe" style="color: var(--teal);"></i> <span id="langText">EN</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main style="flex-grow: 1; max-width: 64rem; margin: 0 auto; width: 100%; padding: 3rem 1rem; position: relative; z-index: 10;">
+
+        <!-- Calculator Section -->
+        <section id="kalkulator-keperluan" class="glass-card reveal" style="border-radius: 2.5rem; overflow: visible;">
+            <div style="position: relative; overflow: hidden; border-top-left-radius: 2.5rem; border-top-right-radius: 2.5rem; padding: 2.5rem; text-align: center; border-bottom: 1px solid var(--border-color);">
+                <div style="position: absolute; inset: 0; background: radial-gradient(circle at 50% 0%, rgba(0,129,131,0.15) 0%, transparent 70%); opacity: 0.6;"></div>
+                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(to right, transparent, var(--teal), transparent);"></div>
+                
+                <div style="display: inline-flex; align-items: center; justify-content: center; width: 4rem; height: 4rem; border-radius: 50%; background: var(--input-bg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; position: relative; z-index: 10;">
+                    <i class="fas fa-calculator" style="font-size: 1.25rem; color: var(--teal);"></i>
+                </div>
+                
+                <h3 style="position: relative; z-index: 10; font-size: 1.75rem; font-weight: 900; letter-spacing: -0.025em; margin-bottom: 0.75rem;" data-translate="calc_title">Kalkulator Keperluan Perlindungan</h3>
+                <p style="position: relative; z-index: 10; font-size: 0.9rem; color: var(--text-muted); font-weight: 500; max-width: 36rem; margin: 0 auto;" data-translate="calc_subtitle">Kira anggaran keperluan kewangan untuk diri & keluarga, mengambil kira kadar inflasi semasa.</p>
+            </div>
+            
+            <div style="padding: 2rem;">
+                <div id="errorAlert" style="display: none; margin-bottom: 2rem; padding: 1rem; background: rgba(127, 29, 29, 0.2); color: #f87171; border: 1px solid rgba(153, 27, 27, 0.4); border-radius: 0.75rem; font-size: 0.85rem; font-weight: 600;" data-translate="calc_error">Nota: Perbelanjaan bulanan anda melebihi pendapatan bulanan. Sila semak semula.</div>
+
+                <form id="needsCalculatorForm" class="glass-input-container" style="display: flex; flex-direction: column; gap: 2rem;">
+                    
+                    <!-- Row 1: Basics -->
+                    <div class="grid-row grid-row-2">
+                        <div style="position: relative;">
+                            <label class="form-label"><span data-translate="calc_name">Nama Penuh</span></label>
+                            <input type="text" id="calcName" class="form-input auto-save" placeholder="Cth: Ahmad Fairuz" required>
+                        </div>
+                        <div style="position: relative;">
+                            <label class="form-label"><span data-translate="calc_age">Umur Semasa</span></label>
+                            <input type="number" id="calcAge" class="form-input auto-save" value="35" min="18" max="80" required>
+                        </div>
+                    </div>
+
+                    <div style="height: 1px; width: 100%; background: var(--border-color); margin: 0.5rem 0;"></div>
+
+                    <!-- Row 2: Cashflow & Assets -->
+                    <div class="grid-row grid-row-3">
+                        <div style="position: relative;">
+                            <label class="form-label">
+                                <span data-translate="calc_income">Pendapatan Bulanan</span>
+                                <div style="position: relative; display: inline-flex; margin-left: 0.5rem;">
+                                    <button type="button" onclick="toggleTooltip(event, 'tip-income')" style="background:none; border:none; cursor:pointer;"><i class="fas fa-info-circle" style="color: var(--text-muted); font-size: 0.9rem;"></i></button>
+                                    <div id="tip-income" class="info-tooltip infotip-box" onclick="event.stopPropagation()"><span data-translate="tip_income">Gaji bersih bulanan, hasil sewa, & pendapatan lain.</span></div>
+                                </div>
+                            </label>
+                            <div style="position: relative;">
+                                <span style="position: absolute; left: 1rem; top: 0.85rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 700;">RM</span>
+                                <input type="text" inputmode="numeric" id="calcIncome" class="calc-currency form-input auto-save" style="padding-left: 3rem;" placeholder="0" required>
+                            </div>
+                        </div>
+                        <div style="position: relative;">
+                            <label class="form-label">
+                                <span data-translate="calc_expenses">Perbelanjaan Bulanan</span>
+                                <div style="position: relative; display: inline-flex; margin-left: 0.5rem;">
+                                    <button type="button" onclick="toggleTooltip(event, 'tip-expenses')" style="background:none; border:none; cursor:pointer;"><i class="fas fa-info-circle" style="color: var(--text-muted); font-size: 0.9rem;"></i></button>
+                                    <div id="tip-expenses" class="info-tooltip infotip-box" onclick="event.stopPropagation()"><span data-translate="tip_expenses">Komitmen bil, ansuran & barang keperluan. Semakan lebihan aliran tunai.</span></div>
+                                </div>
+                            </label>
+                            <div style="position: relative;">
+                                <span style="position: absolute; left: 1rem; top: 0.85rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 700;">RM</span>
+                                <input type="text" inputmode="numeric" id="calcExpenses" class="calc-currency form-input auto-save" style="padding-left: 3rem;" placeholder="0" required>
+                            </div>
+                        </div>
+                        <div style="position: relative;">
+                            <label class="form-label">
+                                <span data-translate="calc_liquid">Aset Cair (Tunai/KWSP/ASB)</span>
+                                <div style="position: relative; display: inline-flex; margin-left: 0.5rem;">
+                                    <button type="button" onclick="toggleTooltip(event, 'tip-liquid')" style="background:none; border:none; cursor:pointer;"><i class="fas fa-info-circle" style="color: var(--text-muted); font-size: 0.9rem;"></i></button>
+                                    <div id="tip-liquid" class="info-tooltip infotip-box" onclick="event.stopPropagation()"><span data-translate="tip_liquid">Jumlah simpanan mudah cair keluarga yang boleh digunakan untuk membiayai kelangsungan hidup (akan ditolak dari keperluan Hayat). Biarkan 0 jika tiada.</span></div>
+                                </div>
+                            </label>
+                            <div style="position: relative;">
+                                <span style="position: absolute; left: 1rem; top: 0.85rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 700;">RM</span>
+                                <input type="text" inputmode="numeric" id="calcLiquidAssets" class="calc-currency form-input auto-save" style="padding-left: 3rem;" placeholder="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Liabilities & Replacement Parameters -->
+                    <div class="grid-row grid-row-3">
+                        <div style="position: relative;">
+                            <label class="form-label">
+                                <span data-translate="calc_debt">Hutang Tertunggak</span>
+                                <div style="position: relative; display: inline-flex; margin-left: 0.5rem;">
+                                    <button type="button" onclick="toggleTooltip(event, 'tip-debt')" style="background:none; border:none; cursor:pointer;"><i class="fas fa-info-circle" style="color: var(--text-muted); font-size: 0.9rem;"></i></button>
+                                    <div id="tip-debt" class="info-tooltip infotip-box" onclick="event.stopPropagation()"><span data-translate="tip_debt">Baki kad kredit, pinjaman peribadi. Jangan letak hutang yang dah ada MRTT/MLTT.</span></div>
+                                </div>
+                            </label>
+                            <div style="position: relative;">
+                                <span style="position: absolute; left: 1rem; top: 0.85rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 700;">RM</span>
+                                <input type="text" inputmode="numeric" id="calcDebt" class="calc-currency form-input auto-save" style="padding-left: 3rem;" placeholder="0">
+                            </div>
+                        </div>
+                        <div style="position: relative;">
+                            <label class="form-label">
+                                <span data-translate="calc_funeral">Kos Pengurusan Jenazah</span>
+                                <div style="position: relative; display: inline-flex; margin-left: 0.5rem;">
+                                    <button type="button" onclick="toggleTooltip(event, 'tip-funeral')" style="background:none; border:none; cursor:pointer;"><i class="fas fa-info-circle" style="color: var(--text-muted); font-size: 0.9rem;"></i></button>
+                                    <div id="tip-funeral" class="info-tooltip infotip-box" onclick="event.stopPropagation()"><span data-translate="tip_funeral">Anggaran kasar pengurusan, kenduri & kos luar jangka. Default disyorkan: RM10,000.</span></div>
+                                </div>
+                            </label>
+                            <div style="position: relative;">
+                                <span style="position: absolute; left: 1rem; top: 0.85rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 700;">RM</span>
+                                <input type="text" inputmode="numeric" id="calcFuneral" class="calc-currency form-input auto-save" style="padding-left: 3rem;" value="10,000" required>
+                            </div>
+                        </div>
+                        <div style="position: relative;">
+                            <label class="form-label">
+                                <span data-translate="calc_income_replace">Ganti Pendapatan (%)</span>
+                                <div style="position: relative; display: inline-flex; margin-left: 0.5rem;">
+                                    <button type="button" onclick="toggleTooltip(event, 'tip-income-replace')" style="background:none; border:none; cursor:pointer;"><i class="fas fa-info-circle" style="color: var(--text-muted); font-size: 0.9rem;"></i></button>
+                                    <div id="tip-income-replace" class="info-tooltip infotip-box" onclick="event.stopPropagation()"><span data-translate="tip_income_replace">Standard analisis keperluan mengesyorkan 70-80% kerana perbelanjaan ketua keluarga terhenti apabila tiada.</span></div>
+                                </div>
+                            </label>
+                            <div style="position: relative;">
+                                <input type="number" id="calcIncomeReplace" class="form-input auto-save" style="padding-right: 3rem;" value="75" min="10" max="100" required>
+                                <span style="position: absolute; right: 1rem; top: 0.85rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 700;">%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="height: 1px; width: 100%; background: var(--border-color); margin: 0.5rem 0;"></div>
+
+                    <!-- Row 4: Life Param -->
+                    <div class="grid-row grid-row-3">
+                        <div style="position: relative;">
+                            <label class="form-label">
+                                <span data-translate="calc_exist_life">Sedia Ada: Hayat/Hibah/TPD</span>
+                                <div style="position: relative; display: inline-flex; margin-left: 0.5rem;">
+                                    <button type="button" onclick="toggleTooltip(event, 'tip-exist-life')" style="background:none; border:none; cursor:pointer;"><i class="fas fa-info-circle" style="color: var(--text-muted); font-size: 0.9rem;"></i></button>
+                                    <div id="tip-exist-life" class="info-tooltip infotip-box" onclick="event.stopPropagation()"><span data-translate="tip_exist_life">Pampasan sedia ada (Polisi individu atau Manfaat Pekerja / Group Term Life). Biarkan 0 jika tiada.</span></div>
+                                </div>
+                            </label>
+                            <div style="position: relative;">
+                                <span style="position: absolute; left: 1rem; top: 0.85rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 700;">RM</span>
+                                <input type="text" inputmode="numeric" id="calcExistLife" class="calc-currency form-input auto-save" style="padding-left: 3rem;" placeholder="0">
+                            </div>
+                        </div>
+                        <div style="position: relative;">
+                            <label class="form-label">
+                                <span data-translate="calc_life_years">Tahun Sokongan Keluarga</span>
+                                <div style="position: relative; display: inline-flex; margin-left: 0.5rem;">
+                                    <button type="button" onclick="toggleTooltip(event, 'tip-life-years')" style="background:none; border:none; cursor:pointer;"><i class="fas fa-info-circle" style="color: var(--text-muted); font-size: 0.9rem;"></i></button>
+                                    <div id="tip-life-years" class="info-tooltip infotip-box" onclick="event.stopPropagation()"><span data-translate="tip_life_years">💡 Panduan: 22 tolak umur anak bongsu. (Tempoh anak tamat belajar & berdikari).</span></div>
+                                </div>
+                            </label>
+                            <div style="position: relative;">
+                                <input type="number" id="calcLifeYears" class="form-input auto-save" style="padding-right: 5rem;" value="10" min="1" max="50" required>
+                                <span style="position: absolute; right: 1rem; top: 0.85rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 700;" data-translate="calc_years">Tahun</span>
+                            </div>
+                        </div>
+                        <div style="position: relative;">
+                            <label class="form-label">
+                                <span data-translate="calc_inflation">Kadar Inflasi Am (%)</span>
+                                <div style="position: relative; display: inline-flex; margin-left: 0.5rem;">
+                                    <button type="button" onclick="toggleTooltip(event, 'tip-inflation')" style="background:none; border:none; cursor:pointer;"><i class="fas fa-info-circle" style="color: var(--text-muted); font-size: 0.9rem;"></i></button>
+                                    <div id="tip-inflation" class="info-tooltip infotip-box" onclick="event.stopPropagation()"><span data-translate="tip_inflation">Purata inflasi kos sara hidup (Biasa: 3% - 5%). Diperlukan untuk unjuran kewangan realistik.</span></div>
+                                </div>
+                            </label>
+                            <div style="position: relative;">
+                                <input type="number" id="calcInflation" class="form-input auto-save" style="padding-right: 3rem;" value="3" step="0.1" min="0" max="20" required>
+                                <span style="position: absolute; right: 1rem; top: 0.85rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 700;">%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 5: CI -->
+                    <div class="grid-row grid-row-3">
+                        <div style="position: relative;">
+                            <label class="form-label">
+                                <span data-translate="calc_exist_ci">Sedia Ada: Sakit Kritikal</span>
+                                <div style="position: relative; display: inline-flex; margin-left: 0.5rem;">
+                                    <button type="button" onclick="toggleTooltip(event, 'tip-exist-ci')" style="background:none; border:none; cursor:pointer;"><i class="fas fa-info-circle" style="color: var(--text-muted); font-size: 0.9rem;"></i></button>
+                                    <div id="tip-exist-ci" class="info-tooltip infotip-box" onclick="event.stopPropagation()"><span data-translate="tip_exist_ci">Pampasan lumpsum Penyakit Kritikal (Polisi individu / majikan). Biarkan 0 jika tiada.</span></div>
+                                </div>
+                            </label>
+                            <div style="position: relative;">
+                                <span style="position: absolute; left: 1rem; top: 0.85rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 700;">RM</span>
+                                <input type="text" inputmode="numeric" id="calcExistCI" class="calc-currency form-input auto-save" style="padding-left: 3rem;" placeholder="0">
+                            </div>
+                        </div>
+                        <div style="position: relative;">
+                            <label class="form-label">
+                                <span data-translate="calc_ci_years">Tahun Rehat (Recovery)</span>
+                                <div style="position: relative; display: inline-flex; margin-left: 0.5rem;">
+                                    <button type="button" onclick="toggleTooltip(event, 'tip-ci-years')" style="background:none; border:none; cursor:pointer;"><i class="fas fa-info-circle" style="color: var(--text-muted); font-size: 0.9rem;"></i></button>
+                                    <div id="tip-ci-years" class="info-tooltip infotip-box" onclick="event.stopPropagation()"><span data-translate="tip_ci_years">Tempoh masa rehat berubat tanpa bekerja (Disyorkan: 3 - 5 Tahun).</span></div>
+                                </div>
+                            </label>
+                            <div style="position: relative;">
+                                <input type="number" id="calcCIYears" class="form-input auto-save" style="padding-right: 5rem;" value="3" min="1" max="20" required>
+                                <span style="position: absolute; right: 1rem; top: 0.85rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 700;" data-translate="calc_years">Tahun</span>
+                            </div>
+                        </div>
+                        <div style="position: relative;">
+                            <label class="form-label">
+                                <span data-translate="calc_ci_buffer">Kos Tambahan Rawatan</span>
+                                <div style="position: relative; display: inline-flex; margin-left: 0.5rem;">
+                                    <button type="button" onclick="toggleTooltip(event, 'tip-ci-buffer')" style="background:none; border:none; cursor:pointer;"><i class="fas fa-info-circle" style="color: var(--text-muted); font-size: 0.9rem;"></i></button>
+                                    <div id="tip-ci-buffer" class="info-tooltip infotip-box" onclick="event.stopPropagation()"><span data-translate="tip_ci_buffer">Bantuan kos suplemen, perubatan alternatif atau kos rawatan yang tidak dicover medical card. Default disyorkan: RM50k.</span></div>
+                                </div>
+                            </label>
+                            <div style="position: relative;">
+                                <span style="position: absolute; left: 1rem; top: 0.85rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 700;">RM</span>
+                                <input type="text" inputmode="numeric" id="calcCIBuffer" class="calc-currency form-input auto-save" style="padding-left: 3rem;" value="50,000" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 6: Medical -->
+                    <div class="grid-row grid-row-2">
+                        <div style="position: relative;">
+                            <label class="form-label">
+                                <span data-translate="calc_exist_med">Had Tahunan Perubatan Sedia Ada</span>
+                                <div style="position: relative; display: inline-flex; margin-left: 0.5rem;">
+                                    <button type="button" onclick="toggleTooltip(event, 'tip-exist-med')" style="background:none; border:none; cursor:pointer;"><i class="fas fa-info-circle" style="color: var(--text-muted); font-size: 0.9rem;"></i></button>
+                                    <div id="tip-exist-med" class="info-tooltip infotip-box" onclick="event.stopPropagation()"><span data-translate="tip_exist_med">Had bil hospital tahunan (annual limit). Biarkan 0 jika tiada polisi perubatan. *(Asas RM100,000 akan diguna untuk unjuran jika tiada polisi)*.</span></div>
+                                </div>
+                            </label>
+                            <div style="position: relative;">
+                                <span style="position: absolute; left: 1rem; top: 0.85rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 700;">RM</span>
+                                <input type="text" inputmode="numeric" id="calcExistMed" class="calc-currency form-input auto-save" style="padding-left: 3rem;" placeholder="0">
+                                <span style="font-size: 0.65rem; color: var(--teal); position: absolute; right: 0; bottom: -1.2rem;" data-translate="calc_med_hint">*Asas RM100k jika tiada polisi</span>
+                            </div>
+                        </div>
+                        <div style="position: relative;">
+                            <label class="form-label">
+                                <span data-translate="calc_med_inflation">Kadar Inflasi Perubatan (%)</span>
+                                <div style="position: relative; display: inline-flex; margin-left: 0.5rem;">
+                                    <button type="button" onclick="toggleTooltip(event, 'tip-med-inf')" style="background:none; border:none; cursor:pointer;"><i class="fas fa-info-circle" style="color: var(--text-muted); font-size: 0.9rem;"></i></button>
+                                    <div id="tip-med-inf" class="info-tooltip infotip-box" onclick="event.stopPropagation()"><span data-translate="tip_med_inf">Inflasi bil hospital swasta di Malaysia mencatat peningkatan antara 12% hingga 15% setiap tahun (BNM).</span></div>
+                                </div>
+                            </label>
+                            <div style="position: relative;">
+                                <input type="number" id="calcMedInflation" class="form-input auto-save" style="padding-right: 3rem;" value="12" step="0.1" min="0" max="30" required>
+                                <span style="position: absolute; right: 1rem; top: 0.85rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 700;">%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                        <button type="button" id="btnReset" class="btn-primary btn-outline" style="flex: 1; max-width: 150px; border-radius: 1rem;">
+                            <i class="fas fa-undo"></i> <span data-translate="btn_reset">Reset</span>
+                        </button>
+                        <button type="submit" class="btn-primary btn-teal" style="flex: 3; border-radius: 1rem; height: 4rem; font-size: 1.1rem;">
+                            <i class="fas fa-calculator" style="margin-right: 0.5rem;"></i> <span data-translate="calc_btn">Kira Keperluan Semasa</span>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Calculator Results Layout -->
+                <div id="calcResults" style="display: none; margin-top: 3rem; padding-top: 3rem; border-top: 1px solid var(--border-color);">
+                    
+                    <!-- Affordability Panel (Pre-computation display) -->
+                    <div style="background: rgba(0, 129, 131, 0.1); border: 1px solid rgba(0, 129, 131, 0.3); border-radius: 1rem; padding: 1.5rem; margin-bottom: 2.5rem; text-align: center;">
+                        <h5 style="font-size: 0.85rem; color: var(--teal); font-weight: 700; text-transform: uppercase; margin-bottom: 0.5rem;" data-translate="afford_title">Kapasiti Kewangan Anda</h5>
+                        <p style="font-size: 1rem; color: var(--text-main); font-weight: 600; margin-bottom: 0.25rem;"><span data-translate="afford_surplus">Lebihan Aliran Tunai:</span> <span id="resSurplus" style="color: var(--teal);">RM 0</span></p>
+                        <p style="font-size: 0.8rem; color: var(--text-muted);"><span data-translate="afford_guide">Kapasiti Caruman Disyorkan (10-15% Pendapatan):</span> <strong id="resBudget" style="color: var(--text-main);">RM 0 - RM 0</strong></p>
+                    </div>
+
+                    <h4 style="font-size: 1.5rem; font-weight: 900; margin-bottom: 2rem; text-align: center;" data-translate="calc_res_title">Ringkasan Keperluan Perlindungan</h4>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 2rem;" id="resultsGrid">
+                        <!-- Result: Life -->
+                        <div class="result-card">
+                            <div class="result-icon"><i class="fas fa-heartbeat"></i></div>
+                            <h5 class="result-title" data-translate="calc_res_life">Hayat / Hibah / TPD</h5>
+                            <div id="resLifeReq" class="result-amount">RM 0</div>
+                            <div style="font-size: 0.65rem; color: var(--text-muted); margin-top: 0.25rem;" id="resHLV">(Nilai HLV: RM 0)</div>
+                            <div id="resLifeGap" style="margin-top: 1rem; font-size: 0.75rem; font-weight: 700; padding: 0.5rem 1rem; border-radius: 9999px; display: inline-block; width: max-content; margin-left: auto; margin-right: auto;">Gap: RM 0</div>
+                            <p id="descLife" style="margin-top: 1.25rem; font-size: 0.75rem; color: var(--text-muted); line-height: 1.6; text-align: left; border-top: 1px solid var(--border-color); padding-top: 1rem; flex-grow: 1;"></p>
+                        </div>
+                        
+                        <!-- Result: CI -->
+                        <div class="result-card">
+                            <div class="result-icon"><i class="fas fa-user-shield"></i></div>
+                            <h5 class="result-title" data-translate="calc_res_ci">Keperluan Sakit Kritikal</h5>
+                            <div id="resCIReq" class="result-amount">RM 0</div>
+                            <div id="resCIGap" style="margin-top: 1rem; font-size: 0.75rem; font-weight: 700; padding: 0.5rem 1rem; border-radius: 9999px; display: inline-block; width: max-content; margin-left: auto; margin-right: auto;">Gap: RM 0</div>
+                            <p id="descCI" style="margin-top: 1.25rem; font-size: 0.75rem; color: var(--text-muted); line-height: 1.6; text-align: left; border-top: 1px solid var(--border-color); padding-top: 1rem; flex-grow: 1;"></p>
+                        </div>
+                        
+                        <!-- Result: Medical -->
+                        <div class="result-card">
+                            <div class="result-icon result-icon-teal"><i class="fas fa-file-medical"></i></div>
+                            <h5 class="result-title" data-translate="calc_res_med">Unjuran Perubatan (10 Tahun)</h5>
+                            <div id="resMedReq" class="result-amount">RM 0</div>
+                            <div id="resMedGap" style="margin-top: 1rem; font-size: 0.75rem; font-weight: 700; padding: 0.5rem 1rem; border-radius: 9999px; display: inline-block; width: max-content; margin-left: auto; margin-right: auto;">Gap: RM 0</div>
+                            <p id="descMed" style="margin-top: 1.25rem; font-size: 0.75rem; color: var(--text-muted); line-height: 1.6; text-align: left; border-top: 1px solid var(--border-color); padding-top: 1rem; flex-grow: 1;"></p>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div style="display: flex; flex-direction: column; gap: 1rem; align-items: center; justify-content: center; margin-top: 3rem;">
+                        <button type="button" id="btnOpenReport" class="btn-primary btn-pdf">
+                            <i class="fas fa-file-pdf"></i> <span data-translate="btn_pdf">Jana Laporan PDF</span>
+                        </button>
+                        <a id="btnWhatsApp" href="#" target="_blank" rel="noopener noreferrer" class="btn-primary btn-whatsapp" style="max-width: 350px; text-decoration: none;">
+                            <i class="fab fa-whatsapp" style="font-size: 1.2rem;"></i> <span data-translate="btn_wa">Kongsi Analisis WhatsApp</span>
+                        </a>
+                        <p style="text-align: center; font-size: 0.7rem; color: var(--text-muted); margin-top: 1rem;" data-translate="calc_disclaimer">* Anggaran ilustrasi ini diselaraskan mengikut faktor inflasi, aset & liabiliti.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Report Preview Modal (Compact A4 Single-Page Meter Layout) -->
+    <div id="reportModal">
+        <div class="modal-content">
+            <!-- Modal Header Actions -->
+            <div class="no-print" style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 5px; gap: 8px;">
+                <button type="button" onclick="window.print()" style="background: #0284c7; color: white; border: none; padding: 4px 10px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 11px;">
+                    <i class="fas fa-print" style="margin-right: 4px;"></i> <span data-translate="btn_print">Cetak / Simpan PDF</span>
+                </button>
+                <button type="button" id="btnCloseModal" style="background: #64748b; color: white; border: none; padding: 4px 10px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 11px;">
+                    <i class="fas fa-times" style="margin-right: 4px;"></i> <span data-translate="btn_close">Tutup</span>
+                </button>
+            </div>
+
+            <!-- Report Body -->
+            <div id="pdf-report" style="display: flex; flex-direction: column; height: 100%;">
+                
+                <div style="border-bottom: 2px solid #D9000D; padding-bottom: 4px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: flex-end;">
+                    <div>
+                        <h1 class="print-title" style="font-size: 14px; font-weight: 800; color: #D9000D; margin: 0; text-transform: uppercase;" id="pdfTitle">Laporan Keperluan Perlindungan</h1>
+                        <p class="print-text" style="margin: 1px 0 0 0; color: #64748b; font-size: 9px;" id="pdfDate"></p>
+                    </div>
+                    <div style="text-align: right;">
+                        <h2 class="print-sub" style="font-size: 11px; font-weight: 700; margin: 0; color: #1e293b;">TAKAFUL SERVICES</h2>
+                        <p class="print-text" style="margin: 0; color: #64748b; font-size: 9px;">oleh Fairuz Samsuddin</p>
+                    </div>
+                </div>
+
+                <!-- Client Info Bar -->
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 6px 10px; border-radius: 4px; margin-bottom: 6px; display: flex; justify-content: space-between;">
+                    <span class="print-text" style="font-size: 10px;"><strong>Nama Klien:</strong> <span id="repClientName">-</span></span>
+                    <span class="print-text" style="font-size: 10px;"><strong>Umur:</strong> <span id="repClientAge">-</span> Tahun</span>
+                </div>
+
+                <!-- Status Banner -->
+                <div id="reportStatusBanner" style="padding: 6px; border-radius: 4px; margin-bottom: 6px; text-align: center; font-weight: bold; font-size: 10px; background: #fef2f2; color: #ef4444; border: 1px solid #fca5a5;">
+                    STATUS PERLINDUNGAN: PERLU DITAMBAHBAIK
+                </div>
+
+                <!-- Inputs Summary (2 Columns) -->
+                <div style="display: flex; justify-content: space-between; gap: 10px; margin-bottom: 6px;">
+                    <div style="flex: 1;">
+                        <h3 class="print-sub" style="font-size: 10px; text-transform: uppercase; color: #D9000D; border-bottom: 1px solid #e2e8f0; padding-bottom: 3px; margin-bottom: 4px;" id="pdfSub1">Maklumat Kewangan</h3>
+                        <p class="print-text" style="font-size: 9.5px; display: flex; justify-content: space-between; margin: 2px 0;"><span id="pdfIncL">Pendapatan:</span> <strong id="repIncome">RM 0</strong></p>
+                        <p class="print-text" style="font-size: 9.5px; display: flex; justify-content: space-between; margin: 2px 0;"><span id="pdfExpL">Perbelanjaan:</span> <strong id="repExpense">RM 0</strong></p>
+                        <p class="print-text" style="font-size: 9.5px; display: flex; justify-content: space-between; margin: 2px 0; border-top: 1px dashed #e2e8f0; padding-top: 2px;"><span id="pdfSurpL">Lebihan Aliran Tunai:</span> <strong id="repSurplus" style="color: #008183;">RM 0</strong></p>
+                    </div>
+                    <div style="flex: 1;">
+                        <h3 class="print-sub" style="font-size: 10px; text-transform: uppercase; color: #D9000D; border-bottom: 1px solid #e2e8f0; padding-bottom: 3px; margin-bottom: 4px;" id="pdfSub2">Parameter & Aset Liabiliti</h3>
+                        <p class="print-text" style="font-size: 9.5px; display: flex; justify-content: space-between; margin: 2px 0;"><span id="pdfDebtL">Hutang & Jenazah:</span> <strong id="repDebtFun">RM 0</strong></p>
+                        <p class="print-text" style="font-size: 9.5px; display: flex; justify-content: space-between; margin: 2px 0;"><span id="pdfLiqL">Aset Cair (Tolak):</span> <strong id="repLiquid">RM 0</strong></p>
+                        <p class="print-text" style="font-size: 9.5px; display: flex; justify-content: space-between; margin: 2px 0;"><span id="pdfLifeYL">Tahun Sokongan:</span> <strong id="repLifeYears">10 Tahun</strong></p>
+                    </div>
+                </div>
+
+                <!-- Table Comparison -->
+                <h3 class="print-sub" style="font-size: 10px; text-transform: uppercase; color: #D9000D; border-bottom: 1px solid #e2e8f0; padding-bottom: 3px; margin-bottom: 4px;" id="pdfSub3">Ringkasan Keperluan vs Sedia Ada</h3>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px;">
+                    <thead>
+                        <tr style="background: #f1f5f9;">
+                            <th class="print-th" style="padding: 4px; border: 1px solid #cbd5e1; text-align: left; color: #0f172a; font-size: 9.5px;" id="pdfTh1">Kategori</th>
+                            <th class="print-th" style="padding: 4px; border: 1px solid #cbd5e1; text-align: right; color: #0f172a; font-size: 9.5px;" id="pdfTh2">Sedia Ada (RM)</th>
+                            <th class="print-th" style="padding: 4px; border: 1px solid #cbd5e1; text-align: right; color: #0f172a; font-size: 9.5px;" id="pdfTh3">Unjuran Keperluan (RM)</th>
+                            <th class="print-th" style="padding: 4px; border: 1px solid #cbd5e1; text-align: right; color: #0f172a; font-size: 9.5px;" id="pdfTh4">Kekurangan / Gap (RM)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="print-td" style="padding: 4px; border: 1px solid #cbd5e1; color: #1e293b; font-size: 9.5px;" id="pdfTd1">Hayat/Hibah/TPD</td>
+                            <td class="print-td" style="padding: 4px; border: 1px solid #cbd5e1; text-align: right; color: #1e293b; font-size: 9.5px;" id="repLifeExist">0</td>
+                            <td class="print-td" style="padding: 4px; border: 1px solid #cbd5e1; text-align: right; color: #1e293b; font-size: 9.5px;" id="repLifeReqTbl">0</td>
+                            <td class="print-td" style="padding: 4px; border: 1px solid #cbd5e1; text-align: right; font-weight: bold; color: #D9000D; font-size: 9.5px;" id="repLifeGapTbl">0</td>
+                        </tr>
+                        <tr>
+                            <td class="print-td" style="padding: 4px; border: 1px solid #cbd5e1; color: #1e293b; font-size: 9.5px;" id="pdfTd2">Sakit Kritikal</td>
+                            <td class="print-td" style="padding: 4px; border: 1px solid #cbd5e1; text-align: right; color: #1e293b; font-size: 9.5px;" id="repCIExist">0</td>
+                            <td class="print-td" style="padding: 4px; border: 1px solid #cbd5e1; text-align: right; color: #1e293b; font-size: 9.5px;" id="repCIReqTbl">0</td>
+                            <td class="print-td" style="padding: 4px; border: 1px solid #cbd5e1; text-align: right; font-weight: bold; color: #D9000D; font-size: 9.5px;" id="repCIGapTbl">0</td>
+                        </tr>
+                        <tr>
+                            <td class="print-td" style="padding: 4px; border: 1px solid #cbd5e1; color: #1e293b; font-size: 9.5px;" id="pdfTd3">Had Perubatan</td>
+                            <td class="print-td" style="padding: 4px; border: 1px solid #cbd5e1; text-align: right; color: #1e293b; font-size: 9.5px;" id="repMedExist">0</td>
+                            <td class="print-td" style="padding: 4px; border: 1px solid #cbd5e1; text-align: right; color: #1e293b; font-size: 9.5px;" id="repMedReqTbl">0</td>
+                            <td class="print-td" style="padding: 4px; border: 1px solid #cbd5e1; text-align: right; font-weight: bold; color: #D9000D; font-size: 9.5px;" id="repMedGapTbl">0</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Meter / Progress Indicators Section -->
+                <h3 class="print-sub" style="font-size: 10px; text-transform: uppercase; color: #D9000D; border-bottom: 1px solid #e2e8f0; padding-bottom: 3px; margin-bottom: 6px;" id="pdfSub4">Meter Tahap Pencapaian Perlindungan</h3>
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: auto;" id="meterContainer">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; font-size: 9px; margin-bottom: 2px;">
+                            <span style="font-weight: 600; color: #1e293b;" id="meterLabel1">Hayat / Hibah / TPD</span>
+                            <span style="color: #64748b;" id="meterText1">0%</span>
+                        </div>
+                        <div style="width: 100%; height: 8px; background: #e2e8f0; border-radius: 9999px; overflow: hidden;">
+                            <div id="meterBar1" style="height: 100%; width: 0%; background: #008183; border-radius: 9999px;"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display: flex; justify-content: space-between; font-size: 9px; margin-bottom: 2px;">
+                            <span style="font-weight: 600; color: #1e293b;" id="meterLabel2">Sakit Kritikal</span>
+                            <span style="color: #64748b;" id="meterText2">0%</span>
+                        </div>
+                        <div style="width: 100%; height: 8px; background: #e2e8f0; border-radius: 9999px; overflow: hidden;">
+                            <div id="meterBar2" style="height: 100%; width: 0%; background: #008183; border-radius: 9999px;"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display: flex; justify-content: space-between; font-size: 9px; margin-bottom: 2px;">
+                            <span style="font-weight: 600; color: #1e293b;" id="meterLabel3">Had Perubatan (vs 10 Tahun)</span>
+                            <span style="color: #64748b;" id="meterText3">0%</span>
+                        </div>
+                        <div style="width: 100%; height: 8px; background: #e2e8f0; border-radius: 9999px; overflow: hidden;">
+                            <div id="meterBar3" style="height: 100%; width: 0%; background: #008183; border-radius: 9999px;"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Footer area (Action, Faraid, Disclaimer) -->
+                <div style="border-top: 1px solid #e2e8f0; padding-top: 6px; margin-top: 15px;">
+                    <p class="print-footer-text" style="font-size: 9px; font-weight: 700; color: #0f172a; margin-bottom: 3px;" id="pdfNextStep">Langkah Seterusnya: Sesi penerangan solusi Takaful & unjuran caruman mengikut bajet anda.</p>
+                    <p class="print-footer-text" style="font-size: 8px; color: #64748b; margin-bottom: 2px;" id="pdfFaraid">💡 Nota Penting: Pampasan Takaful (Hibah) akan diserahkan terus kepada penama mutlak tanpa melalui proses pembahagian Faraid, mempercepatkan sokongan kewangan waris.</p>
+                    <p class="print-footer-text" style="font-size: 7.5px; color: #94a3b8;" id="pdfFooter">
+                        * Anggaran untuk tujuan ilustrasi semata-mata. Jumlah perlindungan dan caruman sebenar tertakluk kepada pengunderaitan (underwriting) syarikat. 
+                        Data peribadi tidak disimpan atau dihantar ke mana-mana pelayan (PDPA Compliant).
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const translations = {
+            ms: {
+                anim_title: "Kalkulator Perlindungan",
+                brand_title: "TAKAFUL SERVICES",
+                brand_sub: "by Fairuz Samsuddin",
+                calc_title: "Kalkulator Keperluan Perlindungan",
+                calc_subtitle: "Kira anggaran keperluan kewangan untuk diri & keluarga, mengambil kira kadar inflasi semasa.",
+                calc_error: "Nota: Perbelanjaan bulanan anda melebihi pendapatan bulanan. Sila semak semula.",
+                calc_name: "Nama Penuh",
+                calc_age: "Umur Semasa",
+                calc_income: "Pendapatan Bulanan",
+                calc_expenses: "Perbelanjaan Bulanan",
+                calc_liquid: "Aset Cair (Tunai/KWSP/ASB)",
+                calc_debt: "Hutang Tertunggak",
+                calc_funeral: "Kos Pengurusan Jenazah",
+                calc_income_replace: "Ganti Pendapatan (%)",
+                calc_exist_life: "Sedia Ada: Hayat/Hibah/TPD",
+                calc_life_years: "Tahun Sokongan Keluarga",
+                calc_exist_ci: "Sedia Ada: Sakit Kritikal",
+                calc_ci_years: "Tahun Rehat (Recovery)",
+                calc_ci_buffer: "Kos Tambahan Rawatan",
+                calc_exist_med: "Had Tahunan Perubatan Sedia Ada",
+                calc_med_hint: "*Asas RM100k jika tiada polisi",
+                calc_inflation: "Kadar Inflasi Am (%)",
+                calc_med_inflation: "Kadar Inflasi Perubatan (%)",
+                calc_years: "Tahun",
+                calc_btn: "Kira Keperluan Semasa",
+                btn_reset: "Reset",
+                
+                afford_title: "Kapasiti Kewangan Anda",
+                afford_surplus: "Lebihan Aliran Tunai:",
+                afford_guide: "Kapasiti Caruman Disyorkan (10-15% Pendapatan):",
+                
+                calc_res_title: "Ringkasan Keperluan Perlindungan",
+                calc_res_life: "Hayat / Hibah / TPD",
+                calc_res_ci: "Keperluan Sakit Kritikal",
+                calc_res_med: "Unjuran Perubatan (10 Tahun)",
+                calc_shortfall: "Kekurangan: ",
+                calc_covered: "Dilindungi Penuh",
+                calc_disclaimer: "* Anggaran ilustrasi ini diselaraskan mengikut faktor inflasi, aset & liabiliti.",
+                btn_pdf: "Jana Laporan PDF",
+                btn_wa: "Kongsi Analisis WhatsApp",
+                btn_print: "Cetak / Simpan PDF",
+                btn_close: "Tutup",
+                
+                pdf_title: "LAPORAN KEPERLUAN PERLINDUNGAN",
+                pdf_date: "Tarikh: ",
+                pdf_sub1: "Maklumat Kewangan",
+                pdf_sub2: "Parameter & Aset Liabiliti",
+                pdf_sub3: "Ringkasan Keperluan vs Sedia Ada",
+                pdf_sub4: "Meter Tahap Pencapaian Perlindungan",
+                pdf_th1: "Kategori",
+                pdf_th2: "Sedia Ada (RM)",
+                pdf_th3: "Unjuran (RM)",
+                pdf_th4: "Kekurangan / Gap (RM)",
+                pdf_td1: "Hayat/Hibah/TPD",
+                pdf_td2: "Sakit Kritikal",
+                pdf_td3: "Had Perubatan",
+                pdf_next: "Langkah Seterusnya: Sesi penerangan solusi Takaful & unjuran caruman mengikut bajet anda.",
+                pdf_faraid: "💡 Nota Penting: Pampasan Takaful (Hibah) akan diserahkan terus kepada penama mutlak tanpa melalui proses pembahagian Faraid, mempercepatkan sokongan kewangan waris.",
+                pdf_footer: "* Anggaran untuk tujuan ilustrasi semata-mata. Jumlah perlindungan dan caruman sebenar tertakluk kepada pengunderaitan (underwriting) syarikat. Data peribadi tidak disimpan atau dihantar ke mana-mana pelayan (PDPA Compliant).",
+                status_good: "STATUS PERLINDUNGAN: LENGKAP & KUKUH",
+                status_mod: "STATUS PERLINDUNGAN: SEDERHANA (ADA KEKURANGAN)",
+                status_crit: "STATUS PERLINDUNGAN: KRITIKAL (PERLU DITAMBAHBAIK)",
+
+                tip_income: "Gaji bersih bulanan, hasil sewa, & pendapatan lain.",
+                tip_expenses: "Komitmen bil, ansuran & barang keperluan harian. Semakan untuk lebihan cashflow.",
+                tip_liquid: "Jumlah simpanan cair keluarga (Tunai, KWSP, ASB, Tabung Haji) yang boleh digunakan untuk membiayai kelangsungan hidup (akan ditolak dari keperluan Hayat). Biarkan 0 jika tiada.",
+                tip_debt: "Baki kad kredit, pinjaman peribadi. Jangan letak hutang yang dah ada perlindungan MRTT/MLTT atau Auto-Life.",
+                tip_funeral: "Anggaran pengurusan jenazah, kenduri arwah & badal haji. Default disyorkan: RM10,000.",
+                tip_income_replace: "Standard analisis mengesyorkan penggantian 70-80% pendapatan kerana perbelanjaan ketua keluarga terhenti apabila tiada.",
+                tip_exist_life: "Pampasan kematian/hilang upaya kekal (Hibah) dari polisi peribadi atau Manfaat Pekerja (Group Term Life/SOCSO). Biarkan 0 jika tiada.",
+                tip_life_years: "💡 Panduan Utama: 22 tolak umur anak bongsu. (Anggaran masa sehingga anak tamat belajar & berdikari).",
+                tip_inflation: "Kadar purata inflasi kos sara hidup (Biasa: 3% - 5%).",
+                tip_exist_ci: "Pampasan lumpsum Penyakit Kritikal (CI). Biarkan 0 jika tiada.",
+                tip_ci_years: "Tempoh cadangan rehat berubat tanpa bekerja (Disyorkan: 3 - 5 Tahun).",
+                tip_ci_buffer: "Bantuan kos suplemen, perubatan alternatif atau kos rawatan yang tak dicover medical card. Default: RM50,000.",
+                tip_exist_med: "Had bil hospital tahunan (annual limit). Biarkan 0 jika tiada polisi. *(Asas RM100k akan diguna untuk unjuran jika tiada polisi)*.",
+                tip_med_inf: "Inflasi bil hospital swasta di Malaysia meningkat purata 12% hingga 15% setiap tahun (BNM)."
+            },
+            en: {
+                anim_title: "Protection Calculator",
+                brand_title: "TAKAFUL SERVICES",
+                brand_sub: "by Fairuz Samsuddin",
+                calc_title: "Protection Needs Calculator",
+                calc_subtitle: "Estimate financial requirements for you & your family, factoring in current inflation rates.",
+                calc_error: "Note: Your monthly expenses exceed your monthly income. Please double-check.",
+                calc_name: "Full Name",
+                calc_age: "Current Age",
+                calc_income: "Monthly Income",
+                calc_expenses: "Monthly Expenses",
+                calc_liquid: "Liquid Assets (Cash/EPF/ASB)",
+                calc_debt: "Outstanding Debt",
+                calc_funeral: "Funeral Expenses",
+                calc_income_replace: "Income Replacement (%)",
+                calc_exist_life: "Existing: Life/Hibah/TPD",
+                calc_life_years: "Years of Family Support",
+                calc_exist_ci: "Existing: Critical Illness",
+                calc_ci_years: "Recovery Support Years",
+                calc_ci_buffer: "Additional Treatment Buffer",
+                calc_exist_med: "Existing Annual Medical Limit",
+                calc_med_hint: "*Base RM100k if uninsured",
+                calc_inflation: "General Inflation (%)",
+                calc_med_inflation: "Medical Inflation (%)",
+                calc_years: "Years",
+                calc_btn: "Calculate Current Needs",
+                btn_reset: "Reset",
+                
+                afford_title: "Your Financial Capacity",
+                afford_surplus: "Monthly Cash Flow Surplus:",
+                afford_guide: "Recommended Contribution (10-15% of Income):",
+                
+                calc_res_title: "Protection Needs Summary",
+                calc_res_life: "Life / Hibah / TPD Needs",
+                calc_res_ci: "Critical Illness Needs",
+                calc_res_med: "Medical Projection (10 Yrs)",
+                calc_shortfall: "Shortfall: ",
+                calc_covered: "Fully Covered",
+                calc_disclaimer: "* This illustration adjusts for inflation, current assets, and liabilities.",
+                btn_pdf: "Generate PDF Report",
+                btn_wa: "Share Analysis via WhatsApp",
+                btn_print: "Print / Save PDF",
+                btn_close: "Close",
+                
+                pdf_title: "PROTECTION NEEDS REPORT",
+                pdf_date: "Date: ",
+                pdf_sub1: "Financial Information",
+                pdf_sub2: "Parameters & Assets/Liabilities",
+                pdf_sub3: "Requirements vs Existing Summary",
+                pdf_sub4: "Protection Achievement Meters",
+                pdf_th1: "Category",
+                pdf_th2: "Existing (RM)",
+                pdf_th3: "Projected Need (RM)",
+                pdf_th4: "Shortfall / Gap (RM)",
+                pdf_td1: "Life / Hibah / TPD",
+                pdf_td2: "Critical Illness",
+                pdf_td3: "Medical Limit",
+                pdf_next: "Next Step: Takaful solution briefing and contribution projection based on your budget.",
+                pdf_faraid: "💡 Important Note: Takaful Hibah payouts bypass the Faraid distribution process, providing immediate financial support to your absolute nominees.",
+                pdf_footer: "* Estimates are for illustration purposes only. Actual coverage and contributions are subject to underwriting. Personal data is not saved or transmitted to any server (PDPA Compliant).",
+                status_good: "PROTECTION STATUS: SECURE (≥80%)",
+                status_mod: "PROTECTION STATUS: MODERATE (50-79%)",
+                status_crit: "PROTECTION STATUS: CRITICAL (<50%)",
+
+                tip_income: "Net monthly salary, rental, & other steady income.",
+                tip_expenses: "Fixed commitments & living expenses. Ensures proposals fit cash flow.",
+                tip_liquid: "Family's easily accessible savings (Cash, EPF, ASB) to sustain living (will offset Life needs). Leave 0 if none.",
+                tip_debt: "Personal loans, credit cards. Do not include debts covered by MRTT/MLTT or Auto-Life.",
+                tip_funeral: "Estimated funeral and final settlement costs. Recommended default: RM10,000.",
+                tip_income_replace: "Standard analysis recommends 70-80% replacement since the breadwinner's personal expenses cease.",
+                tip_exist_life: "Existing death/TPD coverage from personal policies or Employer Benefits (Group Term Life/SOCSO). Leave 0 if none.",
+                tip_life_years: "💡 Guide: 22 minus youngest child's age. (Estimated years until independence).",
+                tip_inflation: "Average living cost inflation (Typical: 3% - 5%).",
+                tip_exist_ci: "Current CI lump sum coverage. Leave 0 if none.",
+                tip_ci_years: "Recommended work recovery period (Rule of thumb: 3 - 5 yrs).",
+                tip_ci_buffer: "Buffer for alternative meds, supplements, or non-covered card expenses. Default: RM50,000.",
+                tip_exist_med: "Existing medical card annual limit. Leave 0 if uninsured. *(Base RM100k used if uninsured)*.",
+                tip_med_inf: "Private medical cost inflation in Malaysia averages 12% to 15% annually (BNM)."
+            }
+        };
+
+        let currentLang = 'ms';
+
+        // Splash Screen Logic (Session Storage)
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('opening-sequence');
+            if (sessionStorage.getItem('splashPlayed')) {
+                loader.style.display = 'none';
+                document.querySelectorAll('.reveal').forEach(el => el.classList.add('active'));
+            } else {
+                setTimeout(() => {
+                    loader.style.opacity = '0';
+                    setTimeout(() => {
+                        loader.style.display = 'none';
+                        sessionStorage.setItem('splashPlayed', 'true');
+                        document.querySelectorAll('.reveal').forEach(el => el.classList.add('active'));
+                    }, 500);
+                }, 1800);
+                loader.addEventListener('click', () => {
+                    loader.style.display = 'none';
+                    sessionStorage.setItem('splashPlayed', 'true');
+                    document.querySelectorAll('.reveal').forEach(el => el.classList.add('active'));
+                });
+            }
+        });
+
+        // Local Storage Persistence
+        const formInputs = document.querySelectorAll('.auto-save');
+        
+        function saveToLocal() {
+            formInputs.forEach(input => {
+                localStorage.setItem(input.id, input.value);
+            });
+        }
+        
+        function loadFromLocal() {
+            formInputs.forEach(input => {
+                if(localStorage.getItem(input.id)) {
+                    input.value = localStorage.getItem(input.id);
+                }
+            });
+        }
+
+        formInputs.forEach(input => {
+            input.addEventListener('input', saveToLocal);
+        });
+
+        document.getElementById('btnReset').addEventListener('click', () => {
+            if(confirm(currentLang === 'ms' ? 'Anda pasti mahu memadam semua data?' : 'Are you sure you want to clear all data?')) {
+                document.getElementById('needsCalculatorForm').reset();
+                formInputs.forEach(input => localStorage.removeItem(input.id));
+                document.getElementById('calcResults').style.display = 'none';
+                // Reset defaults for specific fields manually after form reset
+                document.getElementById('calcAge').value = '35';
+                document.getElementById('calcFuneral').value = '10,000';
+                document.getElementById('calcIncomeReplace').value = '75';
+                document.getElementById('calcLifeYears').value = '10';
+                document.getElementById('calcInflation').value = '3';
+                document.getElementById('calcCIYears').value = '3';
+                document.getElementById('calcCIBuffer').value = '50,000';
+                document.getElementById('calcMedInflation').value = '12';
+                saveToLocal();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', loadFromLocal);
+
+        // Tooltip handlers
+        function toggleTooltip(event, id) {
+            event.stopPropagation();
+            const target = document.getElementById(id);
+            const isShown = target.classList.contains('show');
+            document.querySelectorAll('.info-tooltip').forEach(tip => tip.classList.remove('show'));
+            if (!isShown) target.classList.add('show');
+        }
+        document.addEventListener('click', function() { document.querySelectorAll('.info-tooltip').forEach(tip => tip.classList.remove('show')); });
+
+        // Language Toggle
+        function toggleLanguage() {
+            currentLang = currentLang === 'ms' ? 'en' : 'ms';
+            document.getElementById('langText').innerText = currentLang === 'ms' ? 'EN' : 'BM';
+            document.getElementById('htmlTag').setAttribute('lang', currentLang);
+
+            document.querySelectorAll('[data-translate]').forEach(el => {
+                const key = el.getAttribute('data-translate');
+                if (translations[currentLang] && translations[currentLang][key]) { el.innerHTML = translations[currentLang][key]; }
+            });
+
+            // Re-calculate silently if results are already open and form is valid
+            const form = document.getElementById('needsCalculatorForm');
+            if (document.getElementById('calcResults').style.display === 'block' && form.checkValidity()) {
+                window.skipAnimation = true; // flag to skip number animation
+                form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+                window.skipAnimation = false;
+            }
+        }
+
+        // Currency Parsing
+        const currencyInputs = document.querySelectorAll('.calc-currency');
+        currencyInputs.forEach(input => {
+            input.addEventListener('input', function(e) {
+                let rawValue = this.value.replace(/\D/g, '');
+                if (rawValue) { this.value = parseInt(rawValue, 10).toLocaleString('en-MY'); } 
+                else { this.value = ''; }
+            });
+        });
+
+        function parseCurrency(value) { return parseFloat(value.replace(/,/g, '')) || 0; }
+        function formatCurrency(amount) { return 'RM ' + Math.max(0, amount).toLocaleString('en-MY', { maximumFractionDigits: 0 }); }
+
+        function renderGapStyle(element, gap) {
+            const shortfallText = translations[currentLang].calc_shortfall;
+            const coveredText = translations[currentLang].calc_covered;
+            if (gap > 0) {
+                element.innerText = shortfallText + formatCurrency(gap);
+                element.style.background = 'rgba(217, 0, 13, 0.1)'; element.style.border = '1px solid rgba(217, 0, 13, 0.3)'; element.style.color = '#ef4444';
+            } else {
+                element.innerText = coveredText;
+                element.style.background = 'rgba(0, 129, 131, 0.1)'; element.style.border = '1px solid rgba(0, 129, 131, 0.3)'; element.style.color = 'var(--teal)';
+            }
+        }
+
+        function animateValue(obj, start, end, duration) {
+            if (window.skipAnimation) { obj.innerHTML = formatCurrency(end); return; }
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const easeOutQuad = progress * (2 - progress); 
+                const currentVal = Math.floor(easeOutQuad * (end - start) + start);
+                obj.innerHTML = formatCurrency(currentVal);
+                if (progress < 1) window.requestAnimationFrame(step);
+                else obj.innerHTML = formatCurrency(end); 
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        document.getElementById('needsCalculatorForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const alertBox = document.getElementById('errorAlert'); alertBox.style.display = 'none';
+
+            // Extract values
+            const clientName = document.getElementById('calcName').value || '-';
+            const clientAge = parseInt(document.getElementById('calcAge').value) || 35;
+            
+            const income = parseCurrency(document.getElementById('calcIncome').value);
+            const expenses = parseCurrency(document.getElementById('calcExpenses').value);
+            const liquidAssets = parseCurrency(document.getElementById('calcLiquidAssets').value);
+            
+            const debt = parseCurrency(document.getElementById('calcDebt').value);
+            const funeral = parseCurrency(document.getElementById('calcFuneral').value);
+            const incomeReplacePct = (parseFloat(document.getElementById('calcIncomeReplace').value) || 75) / 100;
+
+            const existingLife = parseCurrency(document.getElementById('calcExistLife').value);
+            const lifeYears = parseFloat(document.getElementById('calcLifeYears').value) || 0;
+            
+            const existingCI = parseCurrency(document.getElementById('calcExistCI').value);
+            const ciYears = parseFloat(document.getElementById('calcCIYears').value) || 0;
+            const ciBuffer = parseCurrency(document.getElementById('calcCIBuffer').value);
+            
+            const existingMedical = parseCurrency(document.getElementById('calcExistMed').value);
+            
+            const inflationRate = parseFloat(document.getElementById('calcInflation').value) || 0;
+            const medInflationRate = parseFloat(document.getElementById('calcMedInflation').value) || 0;
+
+            if (expenses > income) { alertBox.style.display = 'block'; }
+
+            const incomeAnnual = income * 12;
+            const incomeToReplace = incomeAnnual * incomeReplacePct;
+
+            // Affordability
+            const surplus = income - expenses;
+            const budgetMin = income * 0.10;
+            const budgetMax = income * 0.15;
+
+            // HLV (Secondary check)
+            const yearsTo65 = Math.max(0, 65 - clientAge);
+            const hlv = incomeAnnual * yearsTo65;
+
+            // 1. Life Required
+            const lifeInfFactor = Math.pow(1 + (inflationRate/100), lifeYears > 0 ? lifeYears / 2 : 0);
+            let lifeRequired = (incomeToReplace * lifeInfFactor * lifeYears) + debt + funeral - liquidAssets;
+            if (lifeRequired < 0) lifeRequired = 0;
+            const lifeGap = lifeRequired - existingLife;
+
+            // 2. CI Required
+            const ciInfFactor = Math.pow(1 + (inflationRate/100), ciYears > 0 ? ciYears / 2 : 0);
+            const ciRequired = (incomeToReplace * ciInfFactor * ciYears) + ciBuffer;
+            const ciGap = ciRequired - existingCI;
+
+            // 3. Medical (10 Yrs) - Base 100k if 0
+            const baseMedical = existingMedical > 0 ? existingMedical : 100000;
+            const medCompoundFactor = Math.pow(1 + (medInflationRate/100), 10); 
+            const medicalRequired = baseMedical * medCompoundFactor;
+            const medicalGap = medicalRequired - existingMedical;
+
+            // Overal Status logic (Weighting)
+            const totalRequired = lifeRequired + ciRequired + medicalRequired;
+            const totalExisting = existingLife + existingCI + existingMedical;
+            const coverageRatio = totalRequired > 0 ? (totalExisting / totalRequired) : 1;
+
+            // UI Render
+            const resultsDiv = document.getElementById('calcResults');
+            
+            document.getElementById('resSurplus').innerText = formatCurrency(surplus);
+            document.getElementById('resBudget').innerText = formatCurrency(budgetMin) + ' - ' + formatCurrency(budgetMax);
+            
+            document.getElementById('resHLV').innerText = `(Nilai HLV: ${formatCurrency(hlv)})`;
+
+            animateValue(document.getElementById('resLifeReq'), 0, lifeRequired, window.skipAnimation ? 0 : 1500);
+            animateValue(document.getElementById('resCIReq'), 0, ciRequired, window.skipAnimation ? 0 : 1500);
+            animateValue(document.getElementById('resMedReq'), 0, medicalRequired, window.skipAnimation ? 0 : 1500);
+
+            renderGapStyle(document.getElementById('resLifeGap'), lifeGap);
+            renderGapStyle(document.getElementById('resCIGap'), ciGap);
+            renderGapStyle(document.getElementById('resMedGap'), medicalGap);
+
+            // Descriptions
+            const percText = (incomeReplacePct * 100) + '%';
+            document.getElementById('descLife').innerHTML = currentLang === 'ms' ? 
+                `<strong>Asas Kiraan:</strong> Ganti ${percText} pendapatan x ${lifeYears} tahun (selepas inflasi ${inflationRate}%) + Hutang (RM${debt.toLocaleString()}) + Jenazah (RM${funeral.toLocaleString()}) - Aset Cair (RM${liquidAssets.toLocaleString()}).` : 
+                `<strong>Basis:</strong> Replace ${percText} income x ${lifeYears} yrs (after ${inflationRate}% inflation) + Debt (RM${debt.toLocaleString()}) + Funeral (RM${funeral.toLocaleString()}) - Liquid Assets (RM${liquidAssets.toLocaleString()}).`;
+                
+            document.getElementById('descCI').innerHTML = currentLang === 'ms' ? 
+                `<strong>Asas Kiraan:</strong> Ganti ${percText} pendapatan selama ${ciYears} tahun (${inflationRate}% inflasi) + Bantuan rawatan tambahan RM${ciBuffer.toLocaleString()}.` : 
+                `<strong>Basis:</strong> Replace ${percText} income for ${ciYears} yrs (${inflationRate}% inflation) + Extra treatment buffer RM${ciBuffer.toLocaleString()}.`;
+
+            document.getElementById('descMed').innerHTML = currentLang === 'ms' ? 
+                `<strong>Kenapa 10 Tahun?:</strong> Pelan perubatan secara fitrahnya <strong>wajib disemak (review) setiap dekad</strong>. Bagi mengekalkan tahap akses rawatan setara dengan perlindungan asas (berasaskan inflasi ${medInflationRate}%), inilah sasaran nilai perlindungan yang akan diperlukan.` : 
+                `<strong>Why 10 Years?:</strong> Medical plans naturally <strong>require reviews every decade</strong>. To maintain purchasing power equivalent to the baseline limit (factoring ${medInflationRate}% inflation), this is the projected target needed.`;
+
+            // Prepare WhatsApp String
+            const waPhone = ""; // Insert your phone here if needed, or leave blank to let user pick contact
+            const waText = currentLang === 'ms' ? 
+                `Salam, ini ringkasan analisis keperluan perlindungan untuk ${clientName}:\n\n`+
+                `*Kapasiti Kewangan*\nLebihan Tunai: RM ${surplus.toLocaleString()}\nBajet Disyorkan: RM ${budgetMin.toLocaleString()} - RM ${budgetMax.toLocaleString()}\n\n`+
+                `*Ringkasan Kekosongan (Gap)*\n`+
+                `1. Hayat/Hibah: ${lifeGap > 0 ? 'Gap RM ' + lifeGap.toLocaleString() : 'Dilindungi Penuh'}\n`+
+                `2. Sakit Kritikal: ${ciGap > 0 ? 'Gap RM ' + ciGap.toLocaleString() : 'Dilindungi Penuh'}\n`+
+                `3. Perubatan (vs 10 Thn): ${medicalGap > 0 ? 'Gap RM ' + medicalGap.toLocaleString() : 'Dilindungi Penuh'}\n\n`+
+                `Mari bincangkan pelan yang bersesuaian dengan bajet ini.`
+                : 
+                `Hi, here is the protection needs summary for ${clientName}:\n\n`+
+                `*Financial Capacity*\nCash Surplus: RM ${surplus.toLocaleString()}\nRecommended Budget: RM ${budgetMin.toLocaleString()} - RM ${budgetMax.toLocaleString()}\n\n`+
+                `*Protection Gap Summary*\n`+
+                `1. Life/Hibah: ${lifeGap > 0 ? 'Gap RM ' + lifeGap.toLocaleString() : 'Fully Covered'}\n`+
+                `2. Critical Illness: ${ciGap > 0 ? 'Gap RM ' + ciGap.toLocaleString() : 'Fully Covered'}\n`+
+                `3. Medical (vs 10 Yrs): ${medicalGap > 0 ? 'Gap RM ' + medicalGap.toLocaleString() : 'Fully Covered'}\n\n`+
+                `Let's discuss a plan that fits this budget.`;
+            
+            document.getElementById('btnWhatsApp').href = `https://wa.me/${waPhone}?text=${encodeURIComponent(waText)}`;
+
+            resultsDiv.style.display = 'block';
+            if(e.isTrusted && !window.skipAnimation) { resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+
+            // ==========================================
+            // PREPARE REPORT PDF DATA
+            // ==========================================
+            const d = new Date();
+            document.getElementById('pdfDate').innerText = translations[currentLang].pdf_date + d.toLocaleDateString(currentLang === 'ms' ? 'ms-MY' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+            
+            // Labels
+            const els = ['pdfTitle','pdfSub1','pdfSub2','pdfSub3','pdfSub4','pdfTh1','pdfTh2','pdfTh3','pdfTh4','pdfTd1','pdfTd2','pdfTd3','pdfNext','pdfFaraid','pdfFooter'];
+            els.forEach(id => { document.getElementById(id).innerText = translations[currentLang][id.toLowerCase()]; });
+
+            document.getElementById('pdfIncL').innerText = translations[currentLang].calc_income + ":";
+            document.getElementById('pdfExpL').innerText = translations[currentLang].calc_expenses + ":";
+            document.getElementById('pdfSurpL').innerText = translations[currentLang].afford_surplus;
+            document.getElementById('pdfLiqL').innerText = translations[currentLang].calc_liquid + ":";
+            document.getElementById('pdfDebtL').innerText = currentLang === 'ms' ? "Hutang & Jenazah:" : "Debt & Funeral:";
+            document.getElementById('pdfLifeYL').innerText = translations[currentLang].calc_life_years + ":";
+
+            // Values
+            document.getElementById('repClientName').innerText = clientName;
+            document.getElementById('repClientAge').innerText = clientAge;
+            document.getElementById('repIncome').innerText = formatCurrency(income);
+            document.getElementById('repExpense').innerText = formatCurrency(expenses);
+            document.getElementById('repSurplus').innerText = formatCurrency(surplus);
+            document.getElementById('repDebtFun').innerText = formatCurrency(debt + funeral);
+            document.getElementById('repLiquid').innerText = formatCurrency(liquidAssets);
+            document.getElementById('repLifeYears').innerText = lifeYears + " " + translations[currentLang].calc_years;
+
+            // Table Setup
+            document.getElementById('repLifeExist').innerText = formatCurrency(existingLife);
+            document.getElementById('repLifeReqTbl').innerText = formatCurrency(lifeRequired);
+            let gLife = document.getElementById('repLifeGapTbl');
+            if(lifeGap > 0) { gLife.innerText = formatCurrency(lifeGap); gLife.style.color = '#D9000D'; }
+            else { gLife.innerText = translations[currentLang].calc_covered; gLife.style.color = '#008183'; }
+
+            document.getElementById('repCIExist').innerText = formatCurrency(existingCI);
+            document.getElementById('repCIReqTbl').innerText = formatCurrency(ciRequired);
+            let gCI = document.getElementById('repCIGapTbl');
+            if(ciGap > 0) { gCI.innerText = formatCurrency(ciGap); gCI.style.color = '#D9000D'; }
+            else { gCI.innerText = translations[currentLang].calc_covered; gCI.style.color = '#008183'; }
+
+            document.getElementById('repMedExist').innerText = formatCurrency(existingMedical);
+            document.getElementById('repMedReqTbl').innerText = formatCurrency(medicalRequired);
+            let gMed = document.getElementById('repMedGapTbl');
+            if(medicalGap > 0) { gMed.innerText = formatCurrency(medicalGap); gMed.style.color = '#D9000D'; }
+            else { gMed.innerText = translations[currentLang].calc_covered; gMed.style.color = '#008183'; }
+
+            // Status Banner Logic (Overall Ratio)
+            let statusBanner = document.getElementById('reportStatusBanner');
+            if (coverageRatio >= 0.8) {
+                statusBanner.innerText = translations[currentLang].status_good;
+                statusBanner.style.background = "#ecfdf5"; statusBanner.style.color = "#059669"; statusBanner.style.borderColor = "#6ee7b7";
+            } else if (coverageRatio >= 0.5) {
+                statusBanner.innerText = translations[currentLang].status_mod;
+                statusBanner.style.background = "#fffbeb"; statusBanner.style.color = "#d97706"; statusBanner.style.borderColor = "#fcd34d";
+            } else {
+                statusBanner.innerText = translations[currentLang].status_crit;
+                statusBanner.style.background = "#fef2f2"; statusBanner.style.color = "#ef4444"; statusBanner.style.borderColor = "#fca5a5";
+            }
+
+            // Update Meters
+            document.getElementById('meterLabel1').innerText = translations[currentLang].pdf_td1;
+            document.getElementById('meterLabel2').innerText = translations[currentLang].pdf_td2;
+            document.getElementById('meterLabel3').innerText = currentLang === 'ms' ? 'Had Perubatan (vs 10 Tahun)' : 'Medical Limit (vs 10 Yrs)';
+
+            function updateMeter(exist, req, barId, textId) {
+                let pct = req > 0 ? Math.min(100, Math.round((exist / req) * 100)) : 100;
+                if(exist === 0 && req === 0) pct = 0;
+                document.getElementById(barId).style.width = pct + '%';
+                document.getElementById(barId).style.background = pct >= 100 ? '#008183' : '#D9000D';
+                document.getElementById(textId).innerText = pct + '% (' + formatCurrency(exist) + ' / ' + formatCurrency(req) + ')';
+            }
+
+            updateMeter(existingLife, lifeRequired, 'meterBar1', 'meterText1');
+            updateMeter(existingCI, ciRequired, 'meterBar2', 'meterText2');
+            updateMeter(existingMedical, medicalRequired, 'meterBar3', 'meterText3');
+        });
+
+        // Open Report Modal
+        document.getElementById('btnOpenReport').addEventListener('click', function() {
+            window.skipAnimation = true;
+            document.getElementById('needsCalculatorForm').dispatchEvent(new Event('submit', { cancelable: false, bubbles: false }));
+            window.skipAnimation = false;
+            document.getElementById('reportModal').style.display = 'flex';
+        });
+
+        // Close Report Modal
+        document.getElementById('btnCloseModal').addEventListener('click', function() {
+            document.getElementById('reportModal').style.display = 'none';
+        });
+    </script>
+</body>
+</html>
