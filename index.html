@@ -2,7 +2,6 @@
 <html lang="ms" id="htmlTag">
 <head>
     <meta charset="UTF-8">
-    <!-- Diperbaiki: user-scalable=no dan maximum-scale=1.0 dibuang untuk membenarkan pinch-zoom -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="pageTitle">Kalkulator Keperluan Perlindungan</title>
     
@@ -258,12 +257,12 @@
                                 <span data-translate="calc_funeral">Kos Pengurusan Jenazah</span>
                                 <div style="position: relative; display: inline-flex; margin-left: 0.5rem;">
                                     <button type="button" onclick="toggleTooltip(event, 'tip-funeral')" style="background:none; border:none; cursor:pointer;"><i class="fas fa-info-circle" style="color: var(--text-muted); font-size: 0.9rem;"></i></button>
-                                    <div id="tip-funeral" class="info-tooltip infotip-box" onclick="event.stopPropagation()"><span data-translate="tip_funeral">Anggaran kasar pengurusan, kenduri & kos luar jangka. Default disyorkan: RM10,000.</span></div>
+                                    <div id="tip-funeral" class="info-tooltip infotip-box" onclick="event.stopPropagation()"><span data-translate="tip_funeral">Anggaran kasar pengurusan, kenduri & kos luar jangka. Default disyorkan: RM6,000.</span></div>
                                 </div>
                             </label>
                             <div style="position: relative;">
                                 <span style="position: absolute; left: 1rem; top: 0.85rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 700;">RM</span>
-                                <input type="text" inputmode="numeric" id="calcFuneral" class="calc-currency form-input auto-save" style="padding-left: 3rem;" value="10,000" required>
+                                <input type="text" inputmode="numeric" id="calcFuneral" class="calc-currency form-input auto-save" style="padding-left: 3rem;" value="6,000" required>
                             </div>
                         </div>
                         <div style="position: relative;">
@@ -413,7 +412,7 @@
                 <!-- Calculator Results Layout -->
                 <div id="calcResults" style="display: none; margin-top: 3rem; padding-top: 3rem; border-top: 1px solid var(--border-color);">
                     
-                    <!-- Affordability Panel (Pre-computation display) -->
+                    <!-- Affordability Panel -->
                     <div style="background: rgba(0, 129, 131, 0.1); border: 1px solid rgba(0, 129, 131, 0.3); border-radius: 1rem; padding: 1.5rem; margin-bottom: 2.5rem; text-align: center;">
                         <h5 style="font-size: 0.85rem; color: var(--teal); font-weight: 700; text-transform: uppercase; margin-bottom: 0.5rem;" data-translate="afford_title">Kapasiti Kewangan Anda</h5>
                         <p style="font-size: 1rem; color: var(--text-main); font-weight: 600; margin-bottom: 0.25rem;"><span data-translate="afford_surplus">Lebihan Aliran Tunai:</span> <span id="resSurplus" style="color: var(--teal);">RM 0</span></p>
@@ -468,7 +467,7 @@
 
     </main>
 
-    <!-- Report Preview Modal (Compact A4 Single-Page Meter Layout) -->
+    <!-- Report Preview Modal -->
     <div id="reportModal">
         <div class="modal-content">
             <!-- Modal Header Actions -->
@@ -587,7 +586,7 @@
                     </div>
                 </div>
                 
-                <!-- Footer area (Action, Faraid, Disclaimer) -->
+                <!-- Footer area -->
                 <div style="border-top: 1px solid #e2e8f0; padding-top: 6px; margin-top: 15px;">
                     <p class="print-footer-text" style="font-size: 9px; font-weight: 700; color: #0f172a; margin-bottom: 3px;" id="pdfNextStep">Langkah Seterusnya: Sesi penerangan solusi Takaful & unjuran caruman mengikut bajet anda.</p>
                     <p class="print-footer-text" style="font-size: 8px; color: #64748b; margin-bottom: 2px;" id="pdfFaraid">💡 Nota Penting: Pampasan Takaful (Hibah) akan diserahkan terus kepada penama mutlak tanpa melalui proses pembahagian Faraid, mempercepatkan sokongan kewangan waris.</p>
@@ -670,7 +669,7 @@
                 tip_expenses: "Komitmen bil, ansuran & barang keperluan harian. Semakan untuk lebihan cashflow.",
                 tip_liquid: "Jumlah simpanan cair keluarga (Tunai, KWSP, ASB, Tabung Haji) yang boleh digunakan untuk membiayai kelangsungan hidup (akan ditolak dari keperluan Hayat). Biarkan 0 jika tiada.",
                 tip_debt: "Baki kad kredit, pinjaman peribadi. Jangan letak hutang yang dah ada perlindungan MRTT/MLTT atau Auto-Life.",
-                tip_funeral: "Anggaran pengurusan jenazah, kenduri arwah & badal haji. Default disyorkan: RM10,000.",
+                tip_funeral: "Anggaran pengurusan jenazah, kenduri arwah & badal haji. Default disyorkan: RM6,000.",
                 tip_income_replace: "Standard analisis mengesyorkan penggantian 70-80% pendapatan kerana perbelanjaan ketua keluarga terhenti apabila tiada.",
                 tip_exist_life: "Pampasan kematian/hilang upaya kekal (Hibah) dari polisi peribadi atau Manfaat Pekerja (Group Term Life/SOCSO). Biarkan 0 jika tiada.",
                 tip_life_years: "💡 Panduan Utama: 22 tolak umur anak bongsu. (Anggaran masa sehingga anak tamat belajar & berdikari).",
@@ -749,7 +748,7 @@
                 tip_expenses: "Fixed commitments & living expenses. Ensures proposals fit cash flow.",
                 tip_liquid: "Family's easily accessible savings (Cash, EPF, ASB) to sustain living (will offset Life needs). Leave 0 if none.",
                 tip_debt: "Personal loans, credit cards. Do not include debts covered by MRTT/MLTT or Auto-Life.",
-                tip_funeral: "Estimated funeral and final settlement costs. Recommended default: RM10,000.",
+                tip_funeral: "Estimated funeral and final settlement costs. Recommended default: RM6,000.",
                 tip_income_replace: "Standard analysis recommends 70-80% replacement since the breadwinner's personal expenses cease.",
                 tip_exist_life: "Existing death/TPD coverage from personal policies or Employer Benefits (Group Term Life/SOCSO). Leave 0 if none.",
                 tip_life_years: "💡 Guide: 22 minus youngest child's age. (Estimated years until independence).",
@@ -813,9 +812,9 @@
                 document.getElementById('needsCalculatorForm').reset();
                 formInputs.forEach(input => localStorage.removeItem(input.id));
                 document.getElementById('calcResults').style.display = 'none';
-                // Reset defaults for specific fields manually after form reset
+                // Reset defaults manually
                 document.getElementById('calcAge').value = '35';
-                document.getElementById('calcFuneral').value = '10,000';
+                document.getElementById('calcFuneral').value = '6,000';
                 document.getElementById('calcIncomeReplace').value = '75';
                 document.getElementById('calcLifeYears').value = '10';
                 document.getElementById('calcInflation').value = '3';
@@ -828,7 +827,7 @@
 
         document.addEventListener('DOMContentLoaded', loadFromLocal);
 
-        // Tooltip handlers
+        // Tooltips
         function toggleTooltip(event, id) {
             event.stopPropagation();
             const target = document.getElementById(id);
@@ -849,16 +848,15 @@
                 if (translations[currentLang] && translations[currentLang][key]) { el.innerHTML = translations[currentLang][key]; }
             });
 
-            // Re-calculate silently if results are already open and form is valid
             const form = document.getElementById('needsCalculatorForm');
             if (document.getElementById('calcResults').style.display === 'block' && form.checkValidity()) {
-                window.skipAnimation = true; // flag to skip number animation
+                window.skipAnimation = true; 
                 form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
                 window.skipAnimation = false;
             }
         }
 
-        // Currency Parsing
+        // Currency Format
         const currencyInputs = document.querySelectorAll('.calc-currency');
         currencyInputs.forEach(input => {
             input.addEventListener('input', function(e) {
@@ -957,7 +955,6 @@
             const medicalRequired = baseMedical * medCompoundFactor;
             const medicalGap = medicalRequired - existingMedical;
 
-            // Overal Status logic (Weighting)
             const totalRequired = lifeRequired + ciRequired + medicalRequired;
             const totalExisting = existingLife + existingCI + existingMedical;
             const coverageRatio = totalRequired > 0 ? (totalExisting / totalRequired) : 1;
@@ -993,7 +990,7 @@
                 `<strong>Why 10 Years?:</strong> Medical plans naturally <strong>require reviews every decade</strong>. To maintain purchasing power equivalent to the baseline limit (factoring ${medInflationRate}% inflation), this is the projected target needed.`;
 
             // Prepare WhatsApp String
-            const waPhone = ""; // Insert your phone here if needed, or leave blank to let user pick contact
+            const waPhone = ""; 
             const waText = currentLang === 'ms' ? 
                 `Salam, ini ringkasan analisis keperluan perlindungan untuk ${clientName}:\n\n`+
                 `*Kapasiti Kewangan*\nLebihan Tunai: RM ${surplus.toLocaleString()}\nBajet Disyorkan: RM ${budgetMin.toLocaleString()} - RM ${budgetMax.toLocaleString()}\n\n`+
@@ -1022,9 +1019,22 @@
             const d = new Date();
             document.getElementById('pdfDate').innerText = translations[currentLang].pdf_date + d.toLocaleDateString(currentLang === 'ms' ? 'ms-MY' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
             
-            // Labels
-            const els = ['pdfTitle','pdfSub1','pdfSub2','pdfSub3','pdfSub4','pdfTh1','pdfTh2','pdfTh3','pdfTh4','pdfTd1','pdfTd2','pdfTd3','pdfNext','pdfFaraid','pdfFooter'];
-            els.forEach(id => { document.getElementById(id).innerText = translations[currentLang][id.toLowerCase()]; });
+            // Explicitly set translation text directly mapping keys to prevent "undefined" error crashes
+            document.getElementById('pdfTitle').innerText = translations[currentLang].pdf_title;
+            document.getElementById('pdfSub1').innerText = translations[currentLang].pdf_sub1;
+            document.getElementById('pdfSub2').innerText = translations[currentLang].pdf_sub2;
+            document.getElementById('pdfSub3').innerText = translations[currentLang].pdf_sub3;
+            document.getElementById('pdfSub4').innerText = translations[currentLang].pdf_sub4;
+            document.getElementById('pdfTh1').innerText = translations[currentLang].pdf_th1;
+            document.getElementById('pdfTh2').innerText = translations[currentLang].pdf_th2;
+            document.getElementById('pdfTh3').innerText = translations[currentLang].pdf_th3;
+            document.getElementById('pdfTh4').innerText = translations[currentLang].pdf_th4;
+            document.getElementById('pdfTd1').innerText = translations[currentLang].pdf_td1;
+            document.getElementById('pdfTd2').innerText = translations[currentLang].pdf_td2;
+            document.getElementById('pdfTd3').innerText = translations[currentLang].pdf_td3;
+            document.getElementById('pdfNextStep').innerText = translations[currentLang].pdf_next;
+            document.getElementById('pdfFaraid').innerText = translations[currentLang].pdf_faraid;
+            document.getElementById('pdfFooter').innerText = translations[currentLang].pdf_footer;
 
             document.getElementById('pdfIncL').innerText = translations[currentLang].calc_income + ":";
             document.getElementById('pdfExpL').innerText = translations[currentLang].calc_expenses + ":";
@@ -1093,10 +1103,16 @@
             updateMeter(existingMedical, medicalRequired, 'meterBar3', 'meterText3');
         });
 
-        // Open Report Modal
+        // Open Report Modal with Validation Check
         document.getElementById('btnOpenReport').addEventListener('click', function() {
+            const form = document.getElementById('needsCalculatorForm');
+            // Pastikan semua form yang wajib diisi telah diisi sebelum buka PDF
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
             window.skipAnimation = true;
-            document.getElementById('needsCalculatorForm').dispatchEvent(new Event('submit', { cancelable: false, bubbles: false }));
+            form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
             window.skipAnimation = false;
             document.getElementById('reportModal').style.display = 'flex';
         });
